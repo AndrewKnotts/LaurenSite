@@ -1,39 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lauren Guillemette - Portfolio</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lauren Guillemette - Portfolio</title>
+    <style>
+        body {
+            font-family: 'cuteface', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #a36bfd; /* Light Purple Color */
+            /*overflow: hidden; /* Hide overflow to prevent scroll bars */
+        }
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Ensure the background stays behind other content */
+        }
+        header {
+            background-color: #a36bfd; /* Light Purple Color */
+            padding: 20px 0;
+            text-align: center;
+            position: relative; /* Add relative positioning */
+            z-index: 1; /* Ensure header is above background */
+        }
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        nav {
+            background-color: #a36bfd; /* Light Purple Color */
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer; /* Change cursor to pointer */
+        }
+        nav a:hover {
+            background-color: #c0a5ff; /* Darker shade of purple */
+        }
+        section {
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px; /* Add space between sections */
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 20px;
+            justify-content: center;
+        }
+        .gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+       
+    </style>
 </head>
 <body>
+    <canvas id="background"></canvas> <!-- Canvas for the background effect -->
+    <header>
+        <h1>Lauren Guillemette</h1>
+        <p>Art & Design Portfolio</p>
+    </header>
+    <nav>
+        <a onclick="scrollToElement('header')">Home</a>
+        <a onclick="scrollToElement('section-portfolio')">Portfolio</a>
+        <a onclick="scrollToElement('section-contact')">Contact</a>
+    </nav>
+    <section id="section-portfolio">
+        <h2>Portfolio</h2>
+        <div class="gallery">
+            <!-- Add your artwork images here -->
+            <img src="images/gengarimage3.png" alt="Artwork 1">
+            <img src="images/metaknightimage2.png" alt="Artwork 2">
+            <img src="images/sayakaimage1.webp" alt="Artwork 3">
+            <!-- Add more images as needed -->
+        </div>
+    </section>
+    <section id="section-contact">
+        <h2>Contact</h2>
+        <p>Contact information goes here.</p>
+    </section>
+    <footer>
+        <p>&copy; 2024 Your Name - All Rights Reserved</p>
+    </footer>
+    <script>
+        // JavaScript for background effect
+        const canvas = document.getElementById('background');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const numParticles = 1500; // Increased number of particles
+        const repulsionDistance = 100; // Distance from mouse to repel particles
+        const repulsionForce = 0.5; // Strength of repulsion force
+        const velocityDecay = 0.98; // Rate of velocity decay
 
-<header>
-  <h1>Lauren Guillemette</h1>
-  <h2>Portfolio</h2>
-</header>
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-<div class="container">
+        // Initialize particles
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 1, // Random size between 1 and 3
+                vx: Math.random() - 0.5, // Random velocity in x direction
+                vy: Math.random() - 0.5 // Random velocity in y direction
+            });
+        }
 
-  <section class="experience">
-    <h2>Experience</h2>
-    <p>Add your experience here...</p>
-  </section>
+        // Function to draw particles
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#c0a5ff'; // Light Purple color
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
 
-  <section class="artwork">
-    <h2>Artwork</h2>
-    <p>Add your artwork here...</p>
-  </section>
+        // Redraw particles when the window resizes
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawParticles();
+        });
 
-  <section class="designs">
-    <h2>Designs</h2>
-    <p>Add your designs here...</p>
-  </section>
+        // Add mousemove event listener
+        window.addEventListener('mousemove', (event) => {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                const dx = p.x - mouseX;
+                const dy = p.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < repulsionDistance) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = repulsionForce * (repulsionDistance - distance) / repulsionDistance;
+                    p.vx += Math.cos(angle) * force;
+                    p.vy += Math.sin(angle) * force;
+                }
+            }
+        });
 
-</div>
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= velocityDecay; // Velocity decay
+                p.vy *= velocityDecay; // Velocity decay
+                // Bounce off walls
+                if (p.x < 0 || p.x > canvas.width) {
+                    p.vx *= -1;
+                }
+                if (p.y < 0 || p.y > canvas.height) {
+                    p.vy *= -1;
+                }
+            }
+            drawParticles();
+        }
+        animate();
 
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="app.js"></script>
-
+        // Function to scroll to a specific element
+        function scrollToElement(elementId) {
+            const element = document
+            .getElementById(elementId);
+            if (element) {
+                window.scrollTo({
+                    behavior: 'smooth',
+                    top: element.offsetTop
+                });
+            }
+        }
+    </script>
 </body>
 </html>
